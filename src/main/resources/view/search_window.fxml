@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<?import javafx.scene.control.Label?>
+<VBox xmlns="http://javafx.com/javafx/8.0.181" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="ninja.donhk.controllers.Search">
+
+    <padding>
+        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+    </padding>
+
+    <HBox alignment="CENTER" HBox.hgrow="ALWAYS">
+        <TextField HBox.hgrow="ALWAYS"
+                   fx:id="searchBar"
+                   onKeyPressed="#timeToGo"
+                   onKeyReleased="#search"
+        />
+        <ToggleButton fx:id="enableFullText" text="full-text"/>
+    </HBox>
+
+    <Separator/>
+
+    <ScrollPane fx:id="scrollPane" fitToHeight="true" fitToWidth="true" prefViewportHeight="1024">
+        <TableView fx:id="tableView">
+            <columns>
+                <TableColumn fx:id="fileColumn" prefWidth="250.0" text="File"/>
+                <TableColumn fx:id="pathColumn" prefWidth="600.0" text="Path"/>
+            </columns>
+        </TableView>
+    </ScrollPane>
+    <Label fx:id="filesCounter" text="N/A"/>
+</VBox>

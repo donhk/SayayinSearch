@@ -35,3 +35,15 @@ dependencies {
     compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.2'
     compile group: 'com.h2database', name: 'h2', version: '1.4.197'
 }
+
+//create a single Jar with all dependencies
+task fatJar(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'Gradle Jar File Example',
+                'Implementation-Version': version,
+                'Main-Class': 'ninja.donhk.boot.Main'
+    }
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}

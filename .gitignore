@@ -27,4 +27,7 @@ out/
 build/
 *.cfg
 *.db
-
+*.MF
+*.bin
+*.lock
+.gradle/

@@ -15,7 +15,9 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import ninja.donhk.model.FileRecord;
+import ninja.donhk.pojos.DBCredentials;
 import ninja.donhk.services.database.DBManager;
+import ninja.donhk.services.database.DatabaseServer;
 import ninja.donhk.utils.Utils;
 
 import java.io.IOException;
@@ -43,7 +45,7 @@ public class MainWindowController implements Initializable {
     @FXML
     public ScrollPane scrollPane;
 
-    private DBManager dbManager = DBManager.getInstance();
+    private DBManager dbManager;
 
     @FXML
     private void search(KeyEvent keyEvent) {
@@ -143,5 +145,19 @@ public class MainWindowController implements Initializable {
         contextMenu.getItems().addAll(open, openPath, copyPath);
         tableView.setContextMenu(contextMenu);
         tableView.setEditable(false);
+
+        final DatabaseServer server = new DatabaseServer(
+                DBCredentials.USERNAME.val(),
+                DBCredentials.PASSWD.val(),
+                DBCredentials.DATABASE.val()
+        );
+
+        try {
+            server.startServer();
+            dbManager = DBManager.newInstance(server.getConnection());
+            dbManager.loadSchema();
+        } catch (Exception e) {
+            throw new IllegalStateException("Cannot start");
+        }
     }
 }

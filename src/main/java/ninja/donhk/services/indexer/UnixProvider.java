@@ -1,4 +1,4 @@
-package ninja.donhk.service;
+package ninja.donhk.services.indexer;
 
 import java.io.File;
 import java.util.*;
@@ -13,7 +13,6 @@ public class UnixProvider implements TargetProvider {
 
     private UnixProvider(boolean inverted) {
         File[] roots = File.listRoots();
-        System.out.println("Root directories in your system are:");
         List<File> rootsFolders = new ArrayList<>(Arrays.asList(roots));
         //C: D: E:
         for (File root : rootsFolders) {

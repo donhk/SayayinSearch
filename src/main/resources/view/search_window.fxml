@@ -22,9 +22,9 @@
         <TextField HBox.hgrow="ALWAYS"
                    fx:id="searchBar"
                    onKeyPressed="#timeToGo"
-                   onKeyReleased="#search"
-        />
+                   onKeyReleased="#search"/>
         <ToggleButton fx:id="enableFullText" text="full-text"/>
+        <fx:include source="preferences.fxml"/>
     </HBox>
 
     <Separator/>

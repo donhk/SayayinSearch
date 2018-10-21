@@ -1,11 +1,10 @@
-package ninja.donhk.service;
+package ninja.donhk.services.indexer;
 
 import sun.plugin.dom.exception.InvalidStateException;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
+import java.nio.file.*;
+import java.util.*;
 
 public class FileIndexer {
 
@@ -26,10 +25,11 @@ public class FileIndexer {
     }
 
     public void loadFiles() {
-        for (int i = 0; i < provider.findTargets().size(); i++) {
+        List<File> pathsToScan = provider.findTargets();
+        for (int i = 0; i < pathsToScan.size(); i++) {
             try {
                 FileWriter storage = createCacheFile(i);
-                scanFolder(cacheFiles.get(i), storage);
+                scanFolder8(Paths.get(pathsToScan.get(i).toURI()), storage);
                 storage.close();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -37,7 +37,7 @@ public class FileIndexer {
         }
     }
 
-    public long listFiles() {
+    public long indexedFiles() {
         return totalFiles;
     }
 
@@ -47,11 +47,8 @@ public class FileIndexer {
 
     private FileWriter createCacheFile(int idx) {
         try {
-            File cacheFile = new File(System.getProperty("java.io.tmpdir") + File.separator + "saya" + idx);
-            cacheFile.deleteOnExit();
-            if (!cacheFile.createNewFile()) {
-                throw new IOException("Cannot create cache file");
-            }
+            String path = System.getProperty("java.io.tmpdir") + File.separator + "saya" + idx;
+            File cacheFile = new File(path);
             cacheFiles.add(cacheFile);
             return new FileWriter(cacheFile);
         } catch (IOException e) {
@@ -59,25 +56,26 @@ public class FileIndexer {
         }
     }
 
-    private void scanFolder(File file, FileWriter storage) throws IOException {
-        Stack<File> stack = new Stack<>();
+    private void scanFolder8(Path file, FileWriter storage) throws IOException {
+        Stack<Path> stack = new Stack<>();
         stack.push(file);
         while (!stack.empty()) {
-            File file1 = stack.pop();
-            if (file1.isDirectory()) {
+            Path file1 = stack.pop();
+            if (Files.isDirectory(file1)) {
                 totalFiles++;
-                storage.write(file1.getAbsolutePath() + System.lineSeparator());
-                File[] more = file1.listFiles();
-                if (more == null) {
-                    continue;
-                }
-                for (File file2 : more) {
-                    stack.push(file2);
+                storage.write(file1.toAbsolutePath().toString() + System.lineSeparator());
+                try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(file1)) {
+                    for (Path path : directoryStream) {
+                        stack.push(path);
+                    }
+                } catch (AccessDeniedException e) {
+                    //ignored
                 }
             } else {
-                storage.write(file1.getAbsolutePath() + System.lineSeparator());
+                storage.write(file1.toAbsolutePath().toString() + System.lineSeparator());
                 totalFiles++;
             }
         }
     }
+
 }

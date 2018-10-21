@@ -1,6 +1,6 @@
-import ninja.donhk.service.FileIndexer;
-import ninja.donhk.service.TargetProvider;
-import ninja.donhk.service.UnixProvider;
+import ninja.donhk.services.indexer.FileIndexer;
+import ninja.donhk.services.indexer.TargetProvider;
+import ninja.donhk.services.indexer.UnixProvider;
 import org.junit.Test;
 
 import java.time.LocalTime;
@@ -46,7 +46,7 @@ public class FileIndexerTest {
         indexer.loadFiles();
         LocalTime b = LocalTime.now();
         System.out.println(SECONDS.between(a, b));
-        System.out.println("total files " + indexer.listFiles());
+        System.out.println("total files " + indexer.indexedFiles());
         System.out.println("cache files " + indexer.getCacheFiles().size());
         System.out.println(LocalTime.now());
     }
@@ -88,8 +88,15 @@ public class FileIndexerTest {
     @Test
     public void test3() {
         TargetProvider provider = UnixProvider.newInvertedProvider();
-        provider.includeDirs(Arrays.asList("home", "tmp", "mnt"));
-        System.out.println(provider.findTargets());
-        System.out.println(provider.getExclusions());
+        provider.includeDirs(Arrays.asList("home", "tmp", "mnt", "etc", "opt", "srv", "bin", "var", "dev", "lib", "lib64", "run", "snap", "sbin", "lost+found"));
+        FileIndexer indexer = FileIndexer.newInstance(provider);
+        LocalTime a = LocalTime.now();
+        System.out.println(a);
+        indexer.loadFiles();
+        LocalTime b = LocalTime.now();
+        System.out.println(SECONDS.between(a, b));
+        System.out.println("total files " + indexer.indexedFiles());
+        System.out.println("cache files " + indexer.getCacheFiles().size());
+        System.out.println(LocalTime.now());
     }
 }

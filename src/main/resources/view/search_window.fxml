@@ -12,8 +12,9 @@
 
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.cell.PropertyValueFactory?>
+<?import javafx.scene.control.Button?>
 <VBox xmlns="http://javafx.com/javafx/8.0.181" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="ninja.donhk.controllers.Search">
+      fx:controller="ninja.donhk.controllers.MainWindowController">
 
     <padding>
         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
@@ -25,7 +26,7 @@
                    onKeyPressed="#timeToGo"
                    onKeyReleased="#search"/>
         <ToggleButton fx:id="enableFullText" text="full-text"/>
-        <fx:include source="preferences.fxml"/>
+        <Button text="config" onMouseClicked="#openConfigWindow"/>
     </HBox>
 
     <Separator/>

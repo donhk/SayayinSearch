@@ -5,17 +5,17 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import ninja.donhk.controllers.Search;
+import ninja.donhk.controllers.MainWindowController;
 import ninja.donhk.pojos.DBCredentials;
 import ninja.donhk.services.database.DBManager;
 import ninja.donhk.services.database.DatabaseServer;
 import sun.plugin.dom.exception.InvalidStateException;
 
-public class SearchWindow extends Application {
+public class MainWindow extends Application {
 
     private final DBManager dbManager;
 
-    public SearchWindow() {
+    public MainWindow() {
         final DatabaseServer server = new DatabaseServer(
                 DBCredentials.USERNAME.val(),
                 DBCredentials.PASSWD.val(),
@@ -37,7 +37,7 @@ public class SearchWindow extends Application {
         final FXMLLoader searchLoader = new FXMLLoader(getClass().getResource("/view/search_window.fxml"));
         final Parent root = searchLoader.load();
 
-        final Search controller = searchLoader.getController();
+        final MainWindowController controller = searchLoader.getController();
         final Scene scene = new Scene(root, 850, 460);
 
         scene.heightProperty().addListener((obs, oldVal, newVal) -> controller.updateScrollSize(newVal));

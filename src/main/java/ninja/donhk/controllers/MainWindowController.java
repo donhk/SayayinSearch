@@ -3,19 +3,24 @@ package ninja.donhk.controllers;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.Stage;
 import ninja.donhk.model.FileRecord;
 import ninja.donhk.services.database.DBManager;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class Search {
+public class MainWindowController {
 
     @FXML
     public TableView<FileRecord> tableView;
@@ -75,4 +80,19 @@ public class Search {
         }
         return FXCollections.observableArrayList(list);
     }
+
+    public void openConfigWindow(MouseEvent mouseEvent) throws IOException {
+        final FXMLLoader configLoader = new FXMLLoader(getClass().getResource("/view/configuration_menu.fxml"));
+        final Parent parent = configLoader.load();
+
+        final Scene secondScene = new Scene(parent);
+
+        // New window (Stage)
+        final Stage newWindow = new Stage();
+        newWindow.setTitle("Second Stage");
+        newWindow.setScene(secondScene);
+        newWindow.show();
+    }
+
+
 }

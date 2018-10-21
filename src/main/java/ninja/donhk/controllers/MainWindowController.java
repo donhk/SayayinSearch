@@ -88,19 +88,16 @@ public class MainWindowController implements Initializable {
         final MenuItem open = new MenuItem("Open");
         open.setOnAction(e -> {
             final String file = tableView.getSelectionModel().getSelectedItem().pathProperty().getValue();
-            System.out.println(file);
             Utils.openFileWithExplorer(file);
         });
         final MenuItem openPath = new MenuItem("Explore path");
         openPath.setOnAction(e -> {
             final String file = tableView.getSelectionModel().getSelectedItem().pathProperty().getValue();
-            System.out.println(file);
             Utils.openPath(file);
         });
         final MenuItem copyPath = new MenuItem("Copy path");
         copyPath.setOnAction(e -> {
             final String file = tableView.getSelectionModel().getSelectedItem().pathProperty().getValue();
-            System.out.println(file);
             Utils.copyPathToClipboard(file);
         });
 

@@ -6,6 +6,7 @@ import java.io.*;
 import java.nio.file.*;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
 
 public class FileIndexer {
 
@@ -14,7 +15,6 @@ public class FileIndexer {
     private long totalFiles = 0;
     private final TargetProvider provider;
     private final DBManager dbManager;
-    private boolean finished = false;
 
     private FileIndexer(TargetProvider provider, DBManager dbManager) {
         this.provider = provider;
@@ -37,7 +37,6 @@ public class FileIndexer {
                 e.printStackTrace();
             }
         }
-        finished = true;
     }
 
     public long indexedFiles() {
@@ -49,14 +48,14 @@ public class FileIndexer {
     }
 
     private void scanFolder8(Path file) throws IOException, SQLException {
-        Stack<Path> stack = new Stack<>();
+        final Stack<Path> stack = new Stack<>();
         stack.push(file);
         while (!stack.empty()) {
-            Path file1 = stack.pop();
-            if (Files.isDirectory(file1)) {
+            final Path currentFile = stack.pop();
+            if (Files.isDirectory(currentFile)) {
                 totalFiles++;
-                dbManager.insertFile(file1.toAbsolutePath().toString(), file1.getFileName().toString());
-                try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(file1)) {
+                dbManager.insertFile(currentFile.toAbsolutePath().toString(), currentFile.getFileName().toString());
+                try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(currentFile)) {
                     for (Path path : directoryStream) {
                         stack.push(path);
                     }
@@ -64,13 +63,10 @@ public class FileIndexer {
                     //ignored
                 }
             } else {
-                dbManager.insertFile(file1.toAbsolutePath().toString(), file1.getFileName().toString());
+                dbManager.insertFile(currentFile.toAbsolutePath().toString(), currentFile.getFileName().toString());
                 totalFiles++;
             }
         }
     }
 
-    public boolean isFinished() {
-        return finished;
-    }
 }

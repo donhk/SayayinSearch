@@ -17,6 +17,8 @@ import ninja.donhk.services.indexer.UnixProvider;
 
 import java.net.URL;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +40,6 @@ public class ConfigurationController implements Initializable {
 
     public ConfigurationController() {
     }
-
 
     public void scanFiles(MouseEvent mouseEvent) {
         filesCounter.setText("Scanning");
@@ -72,7 +73,8 @@ public class ConfigurationController implements Initializable {
                 indexerThread.start();
                 while (indexerThread.isAlive()) {
                     Thread.sleep(1000);
-                    final String update = dbManager.getTotalRows() + " Found";
+                    DecimalFormat numFormat = new DecimalFormat("###,###,###");
+                    final String update = String.format(" %s Found", numFormat.format(dbManager.getTotalRows()));
                     updateMessage(update);
                 }
                 return null;
@@ -90,7 +92,9 @@ public class ConfigurationController implements Initializable {
             tableView.setItems(getInitData());
             tableView.setEditable(false);
             try {
-                filesCounter.setText(dbManager.getTotalRows() + " files indexed");
+                DecimalFormat numFormat = new DecimalFormat("###,###,###");
+                final String update = String.format(" %s files indexed", numFormat.format(dbManager.getTotalRows()));
+                filesCounter.setText(update);
             } catch (SQLException s) {
                 //ignored
                 filesCounter.setText("Error!");
@@ -102,9 +106,8 @@ public class ConfigurationController implements Initializable {
         thread.start();
     }
 
-
     private ObservableList<FileRecord> getInitData() {
-        List<FileRecord> list = new ArrayList<>();
+        final List<FileRecord> list = new ArrayList<>();
         try {
             for (Map.Entry<String, String> e : dbManager.getRows(-1).entrySet()) {
                 list.add(new FileRecord(e.getValue(), e.getKey()));

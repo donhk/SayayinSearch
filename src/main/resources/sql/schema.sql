@@ -6,3 +6,5 @@ create table files
   path  varchar(2000) unique,
   name  varchar(2000)
 );
+
+create index idx_path on files(path);

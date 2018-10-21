@@ -75,6 +75,9 @@ public class MainWindowController implements Initializable {
 
 
     public void getRowOptions(MouseEvent mouseEvent) {
+        if (tableView.getSelectionModel().getSelectedItem() == null) {
+            return;
+        }
         final String file = tableView.getSelectionModel().getSelectedItem().pathProperty().getValue();
         if (mouseEvent.getButton() == MouseButton.PRIMARY && mouseEvent.getClickCount() == 2) {
             Utils.openFileWithExplorer(file);

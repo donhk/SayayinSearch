@@ -46,11 +46,22 @@ public class DBManager {
 
     public Map<String, String> searchWithRegex(String expression) throws SQLException {
         final Map<String, String> m = new HashMap<>();
-        final String sql = "select path, name from files where regex_like(path,?)";
+        final String sql = "select path, name from files where REGEXP_LIKE(name,?)";
         final PreparedStatement ps = conn.prepareStatement(sql);
         ps.setString(1, expression);
         final ResultSet r = ps.executeQuery();
-        if (r.next()) {
+        while (r.next()) {
+            m.put(r.getString("path"), r.getString("name"));
+        }
+        return m;
+    }
+
+    public Map<String, String> getAllFiles() throws SQLException {
+        final Map<String, String> m = new HashMap<>();
+        final String sql = "select path, name from files";
+        final PreparedStatement ps = conn.prepareStatement(sql);
+        final ResultSet r = ps.executeQuery();
+        while (r.next()) {
             m.put(r.getString("path"), r.getString("name"));
         }
         return m;

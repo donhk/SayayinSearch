@@ -1,9 +1,10 @@
 package ninja.donhk.services.indexer;
 
-import sun.plugin.dom.exception.InvalidStateException;
+import ninja.donhk.services.database.DBManager;
 
 import java.io.*;
 import java.nio.file.*;
+import java.sql.SQLException;
 import java.util.*;
 
 public class FileIndexer {
@@ -12,14 +13,16 @@ public class FileIndexer {
     private final List<File> cacheFiles = new ArrayList<>();
     private long totalFiles = 0;
     private final TargetProvider provider;
+    private final DBManager dbManager;
 
-    private FileIndexer(TargetProvider provider) {
+    private FileIndexer(TargetProvider provider, DBManager dbManager) {
         this.provider = provider;
+        this.dbManager = dbManager;
     }
 
-    public static FileIndexer newInstance(TargetProvider provider) {
+    public static FileIndexer newInstance(TargetProvider provider, DBManager dbManager) {
         if (instance == null) {
-            return new FileIndexer(provider);
+            return new FileIndexer(provider, dbManager);
         }
         return instance;
     }
@@ -28,10 +31,8 @@ public class FileIndexer {
         List<File> pathsToScan = provider.findTargets();
         for (int i = 0; i < pathsToScan.size(); i++) {
             try {
-                FileWriter storage = createCacheFile(i);
-                scanFolder8(Paths.get(pathsToScan.get(i).toURI()), storage);
-                storage.close();
-            } catch (IOException e) {
+                scanFolder8(Paths.get(pathsToScan.get(i).toURI()));
+            } catch (IOException | SQLException e) {
                 e.printStackTrace();
             }
         }
@@ -45,25 +46,14 @@ public class FileIndexer {
         return cacheFiles;
     }
 
-    private FileWriter createCacheFile(int idx) {
-        try {
-            String path = System.getProperty("java.io.tmpdir") + File.separator + "saya" + idx;
-            File cacheFile = new File(path);
-            cacheFiles.add(cacheFile);
-            return new FileWriter(cacheFile);
-        } catch (IOException e) {
-            throw new InvalidStateException("It was not possible to create the cache file");
-        }
-    }
-
-    private void scanFolder8(Path file, FileWriter storage) throws IOException {
+    private void scanFolder8(Path file) throws IOException, SQLException {
         Stack<Path> stack = new Stack<>();
         stack.push(file);
         while (!stack.empty()) {
             Path file1 = stack.pop();
             if (Files.isDirectory(file1)) {
                 totalFiles++;
-                storage.write(file1.toAbsolutePath().toString() + System.lineSeparator());
+                dbManager.insertFile(file1.toAbsolutePath().toString(), file1.getFileName().toString());
                 try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(file1)) {
                     for (Path path : directoryStream) {
                         stack.push(path);
@@ -72,7 +62,7 @@ public class FileIndexer {
                     //ignored
                 }
             } else {
-                storage.write(file1.toAbsolutePath().toString() + System.lineSeparator());
+                dbManager.insertFile(file1.toAbsolutePath().toString(), file1.getFileName().toString());
                 totalFiles++;
             }
         }

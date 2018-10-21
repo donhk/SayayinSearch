@@ -1,11 +1,12 @@
 package ninja.donhk.model;
 
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 public class FileRecord {
 
-    private final SimpleStringProperty nameBean = new SimpleStringProperty("");
-    private final SimpleStringProperty pathBean = new SimpleStringProperty("");
+    private final SimpleStringProperty name = new SimpleStringProperty("");
+    private final SimpleStringProperty path = new SimpleStringProperty("");
 
     public FileRecord() {
         this("", "");
@@ -17,18 +18,18 @@ public class FileRecord {
     }
 
     public void setName(String val) {
-        nameBean.set(val);
+        name.set(val);
     }
 
     public void setPath(String val) {
-        pathBean.set(val);
+        path.set(val);
     }
 
-    public String getNameBean() {
-        return nameBean.getValue();
+    public StringProperty nameProperty() {
+        return name;
     }
 
-    public String getPathBean() {
-        return pathBean.getValue();
+    public StringProperty pathProperty() {
+        return path;
     }
 }

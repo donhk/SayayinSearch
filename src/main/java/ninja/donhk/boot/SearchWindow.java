@@ -5,7 +5,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import ninja.donhk.controllers.Configuration;
 import ninja.donhk.controllers.Search;
 import ninja.donhk.pojos.DBCredentials;
 import ninja.donhk.services.database.DBManager;
@@ -35,9 +34,6 @@ public class SearchWindow extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         dbManager.loadSchema();
-        Configuration configuration = new Configuration();
-        configuration.setDbManager(dbManager);
-
         final FXMLLoader searchLoader = new FXMLLoader(getClass().getResource("/view/search_window.fxml"));
         final Parent root = searchLoader.load();
 

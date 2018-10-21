@@ -1,9 +1,5 @@
 package ninja.donhk.controllers;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -15,17 +11,11 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import ninja.donhk.model.FileRecord;
-import ninja.donhk.services.database.DBManager;
+import ninja.donhk.utils.Utils;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.ResourceBundle;
 
 public class MainWindowController implements Initializable {
@@ -44,8 +34,6 @@ public class MainWindowController implements Initializable {
     public Label filesCounter;
     @FXML
     public ScrollPane scrollPane;
-
-    private DBManager dbManager = DBManager.getInstance();
 
     @FXML
     private void search(KeyEvent keyEvent) {
@@ -68,6 +56,9 @@ public class MainWindowController implements Initializable {
     }
 
     public void openConfigWindow(MouseEvent mouseEvent) throws IOException {
+        if (mouseEvent.getButton() != MouseButton.PRIMARY) {
+            return;
+        }
         final FXMLLoader configLoader = new FXMLLoader(getClass().getResource("/view/configuration_menu.fxml"));
         final Parent parent = configLoader.load();
         final ConfigurationController controller = configLoader.getController();
@@ -77,7 +68,7 @@ public class MainWindowController implements Initializable {
 
         // New window (Stage)
         final Stage newWindow = new Stage();
-        newWindow.setTitle("Second Stage");
+        newWindow.setTitle("Configuration");
         newWindow.setScene(secondScene);
         newWindow.show();
     }
@@ -85,46 +76,32 @@ public class MainWindowController implements Initializable {
 
     public void getRowOptions(MouseEvent mouseEvent) {
         final String file = tableView.getSelectionModel().getSelectedItem().pathProperty().getValue();
-        if (mouseEvent.getButton() == MouseButton.SECONDARY) {
-            showItemOptions(new File(file));
-        } else if (mouseEvent.getButton() == MouseButton.PRIMARY && mouseEvent.getClickCount() == 2) {
-            openFile(new File(file));
+        if (mouseEvent.getButton() == MouseButton.PRIMARY && mouseEvent.getClickCount() == 2) {
+            Utils.openFileWithExplorer(file);
         }
-    }
-
-    private void showItemOptions(File target) {
-        System.out.println("show menu! for " + target.getAbsolutePath());
-
-    }
-
-    private void openFile(File target) {
-        System.out.println("open " + target.getAbsolutePath());
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         final ContextMenu contextMenu = new ContextMenu();
 
-        final MenuItem item1 = new MenuItem("Open");
-        item1.setOnAction(new EventHandler<ActionEvent>() {
-            public void handle(ActionEvent e) {
-                System.out.println("Open");
-            }
+        final MenuItem open = new MenuItem("Open");
+        open.setOnAction(e -> {
+            final String file = tableView.getSelectionModel().getSelectedItem().pathProperty().getValue();
+            Utils.openFileWithExplorer(file);
         });
-        final MenuItem item2 = new MenuItem("Open path");
-        item2.setOnAction(new EventHandler<ActionEvent>() {
-            public void handle(ActionEvent e) {
-                System.out.println("Open path");
-            }
+        final MenuItem openPath = new MenuItem("Open path");
+        openPath.setOnAction(e -> {
+            final String file = tableView.getSelectionModel().getSelectedItem().pathProperty().getValue();
+            Utils.openPath(file);
         });
-        final MenuItem item3 = new MenuItem("Copy path");
-        item2.setOnAction(new EventHandler<ActionEvent>() {
-            public void handle(ActionEvent e) {
-                System.out.println("copy path");
-            }
+        final MenuItem copyPath = new MenuItem("Copy path");
+        copyPath.setOnAction(e -> {
+            final String file = tableView.getSelectionModel().getSelectedItem().pathProperty().getValue();
+            Utils.copyPathToClipboard(file);
         });
-        contextMenu.getItems().addAll(item1, item2, item3);
 
+        contextMenu.getItems().addAll(open, openPath, copyPath);
         tableView.setContextMenu(contextMenu);
     }
 }

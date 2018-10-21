@@ -1,9 +1,10 @@
 package ninja.donhk.utils;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import com.sun.javafx.PlatformUtil;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
+
+import java.io.*;
 
 public class Utils {
     private Utils() {
@@ -23,5 +24,31 @@ public class Utils {
             }
         }
         return sb.toString();
+    }
+
+    public static void openFileWithExplorer(String target) {
+
+    }
+
+
+    public static void openPath(String target) {
+        Platform platform;
+        if (PlatformUtil.isWindows()) {
+            platform = new Windows();
+        } else if (PlatformUtil.isLinux()) {
+            platform = new Linux();
+        } else if (PlatformUtil.isMac()) {
+            platform = new MacOS();
+        } else {
+            return;
+        }
+        platform.openFolder(target);
+    }
+
+    public static void copyPathToClipboard(String target) {
+        final Clipboard clipboard = Clipboard.getSystemClipboard();
+        final ClipboardContent content = new ClipboardContent();
+        content.putString(target);
+        clipboard.setContent(content);
     }
 }

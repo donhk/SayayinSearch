@@ -32,7 +32,7 @@
     <Separator/>
 
     <ScrollPane fx:id="scrollPane" fitToHeight="true" fitToWidth="true" prefViewportHeight="1024">
-        <TableView fx:id="tableView" onMouseClicked="#refreshTable">
+        <TableView fx:id="tableView" onMouseClicked="#getRowOptions">
             <columns>
                 <TableColumn fx:id="fileColumn" prefWidth="250.0" text="File">
                     <cellValueFactory>
@@ -41,7 +41,7 @@
                 </TableColumn>
                 <TableColumn fx:id="pathColumn" prefWidth="600.0" text="Path">
                     <cellValueFactory>
-                        <PropertyValueFactory property="path"/>
+                        <PropertyValueFactory property="path" />
                     </cellValueFactory>
                 </TableColumn>
             </columns>

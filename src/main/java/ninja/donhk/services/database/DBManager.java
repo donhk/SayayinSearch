@@ -86,7 +86,6 @@ public class DBManager {
         return -1;
     }
 
-
     public void loadSchema() throws SQLException, IOException {
         Statement stmt = conn.createStatement();
         stmt.execute(Utils.resource2txt("sql/schema.sql"));

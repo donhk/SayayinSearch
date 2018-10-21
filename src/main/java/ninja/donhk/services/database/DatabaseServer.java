@@ -49,7 +49,7 @@ public class DatabaseServer {
     }
 
     public Connection getConnection() throws SQLException {
-        String url = "jdbc:h2:" + tcpServer.getURL() + database;
+        String url = "jdbc:h2:" + tcpServer.getURL() + database + ";LOG=0;CACHE_SIZE=65536;LOCK_MODE=0;UNDO_LOG=0";
         logger.info("url: " + url);
         conn = DriverManager.getConnection(url, user, password);
         return conn;

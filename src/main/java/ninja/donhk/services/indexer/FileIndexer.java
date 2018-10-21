@@ -6,13 +6,12 @@ import java.io.*;
 import java.nio.file.*;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.*;
 
 public class FileIndexer {
 
     private static FileIndexer instance = null;
     private final List<File> cacheFiles = new ArrayList<>();
-    private long totalFiles = 0;
     private final TargetProvider provider;
     private final DBManager dbManager;
 
@@ -29,44 +28,34 @@ public class FileIndexer {
     }
 
     public void loadFiles() {
-        List<File> pathsToScan = provider.findTargets();
+        final List<File> pathsToScan = provider.findTargets();
+        final ExecutorService executor = Executors.newFixedThreadPool(8);
+        final CompletionService<Void> service = new ExecutorCompletionService<>(executor);
+
         for (File aPathsToScan : pathsToScan) {
+            Path path = Paths.get(aPathsToScan.toURI());
+            service.submit(new IndexWorker(path, dbManager));
+        }
+
+        for (int i = 0; i < pathsToScan.size(); i++) {
             try {
-                scanFolder8(Paths.get(aPathsToScan.toURI()));
-            } catch (IOException | SQLException e) {
+                service.take().get();
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
 
     public long indexedFiles() {
-        return totalFiles;
+        try {
+            return dbManager.getTotalRows();
+        } catch (SQLException e) {
+            return -1;
+        }
     }
 
     public List<File> getCacheFiles() {
         return cacheFiles;
-    }
-
-    private void scanFolder8(Path file) throws IOException, SQLException {
-        final Stack<Path> stack = new Stack<>();
-        stack.push(file);
-        while (!stack.empty()) {
-            final Path currentFile = stack.pop();
-            if (Files.isDirectory(currentFile)) {
-                totalFiles++;
-                dbManager.insertFile(currentFile.toAbsolutePath().toString(), currentFile.getFileName().toString());
-                try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(currentFile)) {
-                    for (Path path : directoryStream) {
-                        stack.push(path);
-                    }
-                } catch (AccessDeniedException e) {
-                    //ignored
-                }
-            } else {
-                dbManager.insertFile(currentFile.toAbsolutePath().toString(), currentFile.getFileName().toString());
-                totalFiles++;
-            }
-        }
     }
 
 }

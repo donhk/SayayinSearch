@@ -44,6 +44,7 @@ public class FileIndexer {
                 e.printStackTrace();
             }
         }
+        executor.shutdown();
     }
 
     public long indexedFiles() {

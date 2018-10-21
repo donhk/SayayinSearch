@@ -8,7 +8,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 
-import javafx.scene.text.Text;
 import ninja.donhk.model.FileRecord;
 import ninja.donhk.services.database.DBManager;
 import ninja.donhk.services.indexer.FileIndexer;
@@ -18,7 +17,6 @@ import ninja.donhk.services.indexer.UnixProvider;
 import java.net.URL;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -72,8 +70,8 @@ public class ConfigurationController implements Initializable {
                 final Thread indexerThread = new Thread(indexer::loadFiles);
                 indexerThread.start();
                 while (indexerThread.isAlive()) {
-                    Thread.sleep(1000);
-                    DecimalFormat numFormat = new DecimalFormat("###,###,###");
+                    Thread.sleep(200);
+                    final DecimalFormat numFormat = new DecimalFormat("###,###,###");
                     final String update = String.format(" %s Found", numFormat.format(dbManager.getTotalRows()));
                     updateMessage(update);
                 }

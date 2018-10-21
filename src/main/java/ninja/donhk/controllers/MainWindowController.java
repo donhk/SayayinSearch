@@ -9,6 +9,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
@@ -27,6 +28,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MainWindowController implements Initializable {
 
@@ -46,6 +49,7 @@ public class MainWindowController implements Initializable {
     public ScrollPane scrollPane;
 
     private DBManager dbManager;
+    private final Pattern pattern = Pattern.compile("[$*^]");
 
     @FXML
     private void search(KeyEvent keyEvent) {
@@ -54,8 +58,6 @@ public class MainWindowController implements Initializable {
         if (isEscape || rawInput.length() == 0) {
             return;
         }
-        System.out.println(rawInput);
-
         final ObservableList<FileRecord> query = FXCollections.observableArrayList();
         final Task<Void> task = new Task<Void>() {
             @Override
@@ -74,8 +76,17 @@ public class MainWindowController implements Initializable {
         final List<FileRecord> list = new ArrayList<>();
 
         try {
-            final String query = Utils.prepateExpression(rawInput);
-            for (Map.Entry<String, String> e : dbManager.searchWithRegex(query).entrySet()) {
+            final Map<String, String> result;
+            final Matcher matcher = pattern.matcher(rawInput);
+
+            if (matcher.find()) {
+                final String query = Utils.prepateExpression(rawInput);
+                result = dbManager.searchWithRegex(query);
+            } else {
+                result = dbManager.searchWithOutRegex(rawInput);
+            }
+
+            for (Map.Entry<String, String> e : result.entrySet()) {
                 list.add(new FileRecord(e.getValue(), e.getKey()));
             }
         } catch (SQLException e) {
@@ -109,6 +120,7 @@ public class MainWindowController implements Initializable {
         final Stage newWindow = new Stage();
         newWindow.setTitle("Configuration");
         newWindow.setScene(secondScene);
+        newWindow.getIcons().add(new Image(getClass().getResourceAsStream("/icons/shenron.png")));
         newWindow.show();
     }
 

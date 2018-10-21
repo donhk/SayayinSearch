@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import ninja.donhk.controllers.MainWindowController;
 
@@ -26,6 +27,7 @@ public class MainWindow extends Application {
         primaryStage.setTitle("Sayayin Search");
         scene.heightProperty();
         primaryStage.setScene(scene);
+        primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/icons/Dragon_Ball.png")));
         primaryStage.show();
     }
 }

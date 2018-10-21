@@ -46,9 +46,21 @@ public class DBManager {
 
     public Map<String, String> searchWithRegex(String expression) throws SQLException {
         final Map<String, String> m = new HashMap<>();
-        final String sql = "select path, name from files where REGEXP_LIKE(name,?)";
+        final String sql = "select path, name from files where REGEXP_LIKE(name,?) limit 1000";
         final PreparedStatement ps = conn.prepareStatement(sql);
         ps.setString(1, expression);
+        final ResultSet r = ps.executeQuery();
+        while (r.next()) {
+            m.put(r.getString("path"), r.getString("name"));
+        }
+        return m;
+    }
+
+    public Map<String, String> searchWithOutRegex(String target) throws SQLException {
+        final Map<String, String> m = new HashMap<>();
+        final String sql = "select path, name from files where name=? limit 1000";
+        final PreparedStatement ps = conn.prepareStatement(sql);
+        ps.setString(1, target);
         final ResultSet r = ps.executeQuery();
         while (r.next()) {
             m.put(r.getString("path"), r.getString("name"));

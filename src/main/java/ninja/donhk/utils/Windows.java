@@ -23,4 +23,9 @@ public class Windows implements Platform {
             e.printStackTrace();
         }
     }
+
+    @Override
+    public void openFile(String target) {
+
+    }
 }

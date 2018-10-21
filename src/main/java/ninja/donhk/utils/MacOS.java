@@ -5,4 +5,9 @@ public class MacOS implements Platform {
     public void openFolder(String target) {
 
     }
+
+    @Override
+    public void openFile(String target) {
+
+    }
 }

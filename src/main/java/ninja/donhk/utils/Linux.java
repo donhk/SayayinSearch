@@ -9,14 +9,25 @@ public class Linux implements Platform {
         final File file = new File(target);
         final ProcessBuilder pb;
         if (file.isDirectory()) {
-            pb = new ProcessBuilder("sh", "-c", "xdg-open " + file.getAbsolutePath());
+            pb = new ProcessBuilder("sh", "-c", "xdg-open '" + file.getAbsolutePath() + "'");
         } else {
             if (file.getParentFile() != null) {
-                pb = new ProcessBuilder("sh", "-c", "xdg-open " + file.getParentFile().getAbsolutePath());
+                pb = new ProcessBuilder("sh", "-c", "xdg-open '" + file.getParentFile().getAbsolutePath() + "'");
             } else {
-                pb = new ProcessBuilder("sh", "-c", "xdg-open " + file.getAbsolutePath());
+                pb = new ProcessBuilder("sh", "-c", "xdg-open '" + file.getAbsolutePath() + "'");
             }
         }
+        try {
+            pb.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void openFile(String target) {
+        final File file = new File(target);
+        final ProcessBuilder pb = new ProcessBuilder("sh", "-c", "xdg-open '" + file.getAbsolutePath() + "'");
         try {
             pb.start();
         } catch (IOException e) {

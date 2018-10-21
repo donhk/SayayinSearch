@@ -15,7 +15,7 @@ public class Utils {
         if (classLoader.getResource(resourceName) == null) {
             throw new IOException("Resource not found " + resourceName);
         }
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
         try (InputStream in = classLoader.getResourceAsStream(resourceName);
              BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
             String line;
@@ -27,21 +27,13 @@ public class Utils {
     }
 
     public static void openFileWithExplorer(String target) {
-
+        final Platform platform = findPlatform();
+        platform.openFile(target);
     }
 
 
     public static void openPath(String target) {
-        Platform platform;
-        if (PlatformUtil.isWindows()) {
-            platform = new Windows();
-        } else if (PlatformUtil.isLinux()) {
-            platform = new Linux();
-        } else if (PlatformUtil.isMac()) {
-            platform = new MacOS();
-        } else {
-            return;
-        }
+        final Platform platform = findPlatform();
         platform.openFolder(target);
     }
 
@@ -50,5 +42,18 @@ public class Utils {
         final ClipboardContent content = new ClipboardContent();
         content.putString(target);
         clipboard.setContent(content);
+    }
+
+
+    private static Platform findPlatform() {
+        Platform platform;
+        if (PlatformUtil.isWindows()) {
+            platform = new Windows();
+        } else if (PlatformUtil.isMac()) {
+            platform = new MacOS();
+        } else {
+            platform = new Linux();
+        }
+        return platform;
     }
 }

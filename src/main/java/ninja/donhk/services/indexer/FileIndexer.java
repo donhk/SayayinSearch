@@ -14,6 +14,7 @@ public class FileIndexer {
     private long totalFiles = 0;
     private final TargetProvider provider;
     private final DBManager dbManager;
+    private boolean finished = false;
 
     private FileIndexer(TargetProvider provider, DBManager dbManager) {
         this.provider = provider;
@@ -29,13 +30,14 @@ public class FileIndexer {
 
     public void loadFiles() {
         List<File> pathsToScan = provider.findTargets();
-        for (int i = 0; i < pathsToScan.size(); i++) {
+        for (File aPathsToScan : pathsToScan) {
             try {
-                scanFolder8(Paths.get(pathsToScan.get(i).toURI()));
+                scanFolder8(Paths.get(aPathsToScan.toURI()));
             } catch (IOException | SQLException e) {
                 e.printStackTrace();
             }
         }
+        finished = true;
     }
 
     public long indexedFiles() {
@@ -68,4 +70,7 @@ public class FileIndexer {
         }
     }
 
+    public boolean isFinished() {
+        return finished;
+    }
 }

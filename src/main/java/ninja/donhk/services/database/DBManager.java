@@ -56,15 +56,34 @@ public class DBManager {
         return m;
     }
 
-    public Map<String, String> getAllFiles() throws SQLException {
+    public Map<String, String> getRows(int rows) throws SQLException {
         final Map<String, String> m = new HashMap<>();
-        final String sql = "select path, name from files";
-        final PreparedStatement ps = conn.prepareStatement(sql);
+        final PreparedStatement ps;
+
+        if (rows == -1) {
+            final String sql1 = "select path, name from files";
+            ps = conn.prepareStatement(sql1);
+        } else {
+            final String sql1 = "select path, name from files limit ?";
+            ps = conn.prepareStatement(sql1);
+            ps.setInt(1, rows);
+        }
+
         final ResultSet r = ps.executeQuery();
         while (r.next()) {
             m.put(r.getString("path"), r.getString("name"));
         }
         return m;
+    }
+
+    public int getTotalRows() throws SQLException {
+        final String sql1 = "select count(path) total from files";
+        final PreparedStatement ps = conn.prepareStatement(sql1);
+        final ResultSet r = ps.executeQuery();
+        if (r.next()) {
+            return r.getInt("total");
+        }
+        return -1;
     }
 
 

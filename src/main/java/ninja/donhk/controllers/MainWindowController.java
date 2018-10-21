@@ -60,31 +60,15 @@ public class MainWindowController {
     }
 
     public void refreshTable(MouseEvent mouseEvent) {
-        tableView.setItems(getInitData());
-        tableView.setEditable(false);
-        try {
-            filesCounter.setText(dbManager.getAllFiles().size() + " files indexed");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
 
-    private ObservableList<FileRecord> getInitData() {
-        List<FileRecord> list = new ArrayList<>();
-        try {
-            for (Map.Entry<String, String> e : dbManager.getAllFiles().entrySet()) {
-                list.add(new FileRecord(e.getValue(), e.getKey()));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return FXCollections.observableArrayList(list);
     }
 
     public void openConfigWindow(MouseEvent mouseEvent) throws IOException {
         final FXMLLoader configLoader = new FXMLLoader(getClass().getResource("/view/configuration_menu.fxml"));
         final Parent parent = configLoader.load();
-
+        final ConfigurationController controller = configLoader.getController();
+        controller.setFilesCounter(filesCounter);
+        controller.setTableView(tableView);
         final Scene secondScene = new Scene(parent);
 
         // New window (Stage)

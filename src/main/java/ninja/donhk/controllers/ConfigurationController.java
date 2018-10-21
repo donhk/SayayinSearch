@@ -90,7 +90,6 @@ public class ConfigurationController implements Initializable {
 
             filesCounter.setText("Finished");
             tableView.setItems(getInitData());
-            tableView.setEditable(false);
             try {
                 DecimalFormat numFormat = new DecimalFormat("###,###,###");
                 final String update = String.format(" %s files indexed", numFormat.format(dbManager.getTotalRows()));

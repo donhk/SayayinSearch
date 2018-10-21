@@ -1,5 +1,8 @@
 package ninja.donhk.controllers;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -12,10 +15,15 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import ninja.donhk.model.FileRecord;
+import ninja.donhk.services.database.DBManager;
 import ninja.donhk.utils.Utils;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 public class MainWindowController implements Initializable {
@@ -35,6 +43,8 @@ public class MainWindowController implements Initializable {
     @FXML
     public ScrollPane scrollPane;
 
+    private DBManager dbManager = DBManager.getInstance();
+
     @FXML
     private void search(KeyEvent keyEvent) {
         boolean isEscape = keyEvent.getCode() == KeyCode.ESCAPE;
@@ -43,6 +53,33 @@ public class MainWindowController implements Initializable {
             return;
         }
         System.out.println(rawInput);
+
+        final ObservableList<FileRecord> query = FXCollections.observableArrayList();
+        final Task<Void> task = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                query.addAll(processQuery(rawInput));
+                return null;
+            }
+        };
+        task.setOnSucceeded(e -> tableView.setItems(query));
+        Thread thread = new Thread(task);
+        thread.setDaemon(true);
+        thread.start();
+    }
+
+    private ObservableList<FileRecord> processQuery(String rawInput) {
+        final List<FileRecord> list = new ArrayList<>();
+
+        try {
+            final String query = Utils.prepateExpression(rawInput);
+            for (Map.Entry<String, String> e : dbManager.searchWithRegex(query).entrySet()) {
+                list.add(new FileRecord(e.getValue(), e.getKey()));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return FXCollections.observableArrayList(list);
     }
 
     public void updateScrollSize(Number newVal) {
@@ -72,7 +109,6 @@ public class MainWindowController implements Initializable {
         newWindow.setScene(secondScene);
         newWindow.show();
     }
-
 
     public void getRowOptions(MouseEvent mouseEvent) {
         if (tableView.getSelectionModel().getSelectedItem() == null) {
@@ -106,5 +142,6 @@ public class MainWindowController implements Initializable {
 
         contextMenu.getItems().addAll(open, openPath, copyPath);
         tableView.setContextMenu(contextMenu);
+        tableView.setEditable(false);
     }
 }

@@ -31,7 +31,6 @@ public class Utils {
         platform.openFile(target);
     }
 
-
     public static void openPath(String target) {
         final Platform platform = findPlatform();
         platform.openFolder(target);
@@ -44,7 +43,6 @@ public class Utils {
         clipboard.setContent(content);
     }
 
-
     private static Platform findPlatform() {
         Platform platform;
         if (PlatformUtil.isWindows()) {
@@ -55,5 +53,12 @@ public class Utils {
             platform = new Linux();
         }
         return platform;
+    }
+
+    public static String prepateExpression(String string) {
+        StringBuilder sb = new StringBuilder();
+        string = string.replace(".", "\\.");
+        string = string.replace("*", ".*");
+        return string;
     }
 }

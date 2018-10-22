@@ -46,7 +46,7 @@ public class DBManager {
 
     public Map<String, String> searchWithRegex(String expression) throws SQLException {
         final Map<String, String> m = new HashMap<>();
-        final String sql = "select path, name from files where REGEXP_LIKE(name,?) limit 1000";
+        final String sql = "select path, name from files where REGEXP_LIKE(name,?) order by name limit 500 ";
         final PreparedStatement ps = conn.prepareStatement(sql);
         ps.setString(1, expression);
         final ResultSet r = ps.executeQuery();
@@ -56,16 +56,50 @@ public class DBManager {
         return m;
     }
 
+    public long searchWithRegexTotal(String expression) throws SQLException {
+        final Map<String, String> m = new HashMap<>();
+        final String sql = "select count(name) total from files where REGEXP_LIKE(name,?) ";
+        final PreparedStatement ps = conn.prepareStatement(sql);
+        ps.setString(1, expression);
+        final ResultSet r = ps.executeQuery();
+        if (r.next()) {
+            return r.getLong("total");
+        }
+        return -1;
+    }
+
     public Map<String, String> searchWithOutRegex(String target) throws SQLException {
         final Map<String, String> m = new HashMap<>();
-        final String sql = "select path, name from files where name=? limit 1000";
+        target = target
+                .replace("!", "!!")
+                .replace("%", "!%")
+                .replace("_", "!_")
+                .replace("[", "![");
+        final String sql = "select path, name from files where name like ? order by name limit 500";
         final PreparedStatement ps = conn.prepareStatement(sql);
-        ps.setString(1, target);
+        ps.setString(1, "%" + target + "%");
         final ResultSet r = ps.executeQuery();
         while (r.next()) {
             m.put(r.getString("path"), r.getString("name"));
         }
         return m;
+    }
+
+    public long searchWithOutRegexTotal(String target) throws SQLException {
+        final Map<String, String> m = new HashMap<>();
+        target = target
+                .replace("!", "!!")
+                .replace("%", "!%")
+                .replace("_", "!_")
+                .replace("[", "![");
+        final String sql = "select count(name) total from files where name like ? ";
+        final PreparedStatement ps = conn.prepareStatement(sql);
+        ps.setString(1, "%" + target + "%");
+        final ResultSet r = ps.executeQuery();
+        if (r.next()) {
+            return r.getLong("total");
+        }
+        return -1;
     }
 
     public Map<String, String> getRows(int rows) throws SQLException {

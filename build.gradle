@@ -9,6 +9,9 @@ sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
+    maven {
+        url 'https://oss.sonatype.org/content/repositories/snapshots/'
+    }
 }
 
 sourceSets {
@@ -34,6 +37,7 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.2'
     compile group: 'com.h2database', name: 'h2', version: '1.4.197'
+    compile group: 'org.reactfx', name: 'reactfx', version: '2.0-SNAPSHOT'
 }
 
 //create a single Jar with all dependencies

@@ -22,9 +22,7 @@
 
     <HBox alignment="CENTER" HBox.hgrow="ALWAYS">
         <TextField HBox.hgrow="ALWAYS"
-                   fx:id="searchBar"
-                   onKeyPressed="#timeToGo"
-                   onKeyReleased="#search"/>
+                   fx:id="searchBar"/>
         <ToggleButton fx:id="enableFullText" text="full-text"/>
         <Button text="config" onMouseClicked="#openConfigWindow"/>
     </HBox>

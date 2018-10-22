@@ -1,5 +1,6 @@
 package ninja.donhk.controllers;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -20,10 +21,13 @@ import ninja.donhk.pojos.DBCredentials;
 import ninja.donhk.services.database.DBManager;
 import ninja.donhk.services.database.DatabaseServer;
 import ninja.donhk.utils.Utils;
+import org.reactfx.EventStreams;
 
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -51,11 +55,15 @@ public class MainWindowController implements Initializable {
     private DBManager dbManager;
     private final Pattern pattern = Pattern.compile("[$*^]");
 
-    @FXML
-    private void search(KeyEvent keyEvent) {
-        boolean isEscape = keyEvent.getCode() == KeyCode.ESCAPE;
+    private void search() {
         String rawInput = searchBar.getText().trim();
-        if (isEscape || rawInput.length() == 0) {
+        if (rawInput.length() == 0) {
+            tableView.setItems(defaultContent());
+            try {
+                filesCounter.setText(dbManager.getTotalRows()+" files");
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
             return;
         }
         final ObservableList<FileRecord> query = FXCollections.observableArrayList();
@@ -72,23 +80,45 @@ public class MainWindowController implements Initializable {
         thread.start();
     }
 
+    private ObservableList<FileRecord> defaultContent() {
+        final List<FileRecord> list = new ArrayList<>();
+
+        try {
+            Map<String, String> result = dbManager.getRows(-1);
+            for (Map.Entry<String, String> e : result.entrySet()) {
+                list.add(new FileRecord(e.getValue(), e.getKey()));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return FXCollections.observableArrayList(list);
+    }
+
     private ObservableList<FileRecord> processQuery(String rawInput) {
         final List<FileRecord> list = new ArrayList<>();
 
         try {
             final Map<String, String> result;
+            final long total;
             final Matcher matcher = pattern.matcher(rawInput);
 
             if (matcher.find()) {
                 final String query = Utils.prepateExpression(rawInput);
                 result = dbManager.searchWithRegex(query);
+                total = dbManager.searchWithRegexTotal(query);
             } else {
                 result = dbManager.searchWithOutRegex(rawInput);
+                total = dbManager.searchWithOutRegexTotal(rawInput);
             }
 
             for (Map.Entry<String, String> e : result.entrySet()) {
                 list.add(new FileRecord(e.getValue(), e.getKey()));
             }
+
+            Platform.runLater(() -> {
+                final DecimalFormat formatter = new DecimalFormat("#,###,###");
+                filesCounter.setText(formatter.format(total) + " matches");
+            });
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -171,5 +201,10 @@ public class MainWindowController implements Initializable {
         } catch (Exception e) {
             throw new IllegalStateException("Cannot start");
         }
+
+        EventStreams.valuesOf(searchBar.textProperty())
+                .successionEnds(Duration.ofMillis(200))
+                .subscribe(s -> search());
+
     }
 }

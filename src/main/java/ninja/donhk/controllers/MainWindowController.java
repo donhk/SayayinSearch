@@ -195,10 +195,10 @@ public class MainWindowController implements Initializable {
         );
 
         try {
-            server.startServer();
             dbManager = DBManager.newInstance(server.getConnection());
             dbManager.loadSchema();
         } catch (Exception e) {
+            e.printStackTrace();
             throw new IllegalStateException("Cannot start");
         }
 

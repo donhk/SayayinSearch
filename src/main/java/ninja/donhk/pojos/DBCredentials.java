@@ -2,7 +2,7 @@ package ninja.donhk.pojos;
 
 public enum DBCredentials {
     USERNAME("sayayin"),
-    DATABASE("/~/sayadb"),
+    DATABASE("/home/donhk/sayadb"),
     PASSWD("StrongPwd");
 
     private String val;

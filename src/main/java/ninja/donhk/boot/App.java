@@ -1,7 +1,6 @@
 package ninja.donhk.boot;
 
 import javafx.application.Application;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -10,7 +9,7 @@ import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 import ninja.donhk.controllers.MainWindowController;
 
-public class MainWindow extends Application {
+public class App extends Application {
 
     public void startApp(String[] args) {
         launch(args);
@@ -27,7 +26,7 @@ public class MainWindow extends Application {
         scene.heightProperty().addListener((obs, oldVal, newVal) -> controller.updateScrollSize(newVal));
         scene.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.ESCAPE) {
-                primaryStage.setIconified(true);
+                primaryStage.close();
             }
         });
         primaryStage.setTitle("Sayayin Search");

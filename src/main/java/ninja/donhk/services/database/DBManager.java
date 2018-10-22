@@ -133,8 +133,25 @@ public class DBManager {
     }
 
     public void loadSchema() throws SQLException, IOException {
-        Statement stmt = conn.createStatement();
-        stmt.execute(Utils.resource2txt("sql/schema.sql"));
-        stmt.closeOnCompletion();
+
+        final boolean tableExists;
+        final String queryCheck = "SELECT count(*) count FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'FILES';";
+        final PreparedStatement ps = conn.prepareStatement(queryCheck);
+        final ResultSet r = ps.executeQuery();
+        if (r.next()) {
+            tableExists = r.getInt("count") == 1;
+        } else {
+            tableExists = false;
+        }
+
+        if (tableExists) {
+            System.out.println("The table exists, nothing to do");
+        } else {
+            System.out.println("loading fresh schema");
+            Statement stmt = conn.createStatement();
+            stmt.execute(Utils.resource2txt("sql/schema.sql"));
+            stmt.closeOnCompletion();
+        }
+
     }
 }

@@ -29,7 +29,6 @@ public class FileIndexerTest {
                 DBCredentials.DATABASE.val()
         );
         try {
-            server.startServer();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -133,6 +132,5 @@ public class FileIndexerTest {
 
     @AfterClass
     public static void end() {
-        server.stopServer();
     }
 }

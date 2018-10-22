@@ -145,9 +145,8 @@ public class DBManager {
         }
 
         if (tableExists) {
-            System.out.println("The table exists, nothing to do");
+            //System.out.println("The table exists, nothing to do");
         } else {
-            System.out.println("loading fresh schema");
             Statement stmt = conn.createStatement();
             stmt.execute(Utils.resource2txt("sql/schema.sql"));
             stmt.closeOnCompletion();

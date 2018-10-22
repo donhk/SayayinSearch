@@ -23,6 +23,7 @@ import ninja.donhk.services.database.DatabaseServer;
 import ninja.donhk.utils.Utils;
 import org.reactfx.EventStreams;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
@@ -60,7 +61,7 @@ public class MainWindowController implements Initializable {
         if (rawInput.length() == 0) {
             tableView.setItems(defaultContent());
             try {
-                filesCounter.setText(dbManager.getTotalRows()+" files");
+                filesCounter.setText(dbManager.getTotalRows() + " files");
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -166,6 +167,11 @@ public class MainWindowController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        initContextMenu();
+        initDatabase();
+    }
+
+    private void initContextMenu() {
         final ContextMenu contextMenu = new ContextMenu();
 
         final MenuItem open = new MenuItem("Open");
@@ -188,10 +194,24 @@ public class MainWindowController implements Initializable {
         tableView.setContextMenu(contextMenu);
         tableView.setEditable(false);
 
+        EventStreams.valuesOf(searchBar.textProperty())
+                .successionEnds(Duration.ofMillis(200))
+                .subscribe(s -> search());
+    }
+
+
+    private void initDatabase() {
+        File home = new File(System.getProperty("user.home") + File.separator + ".saya_search");
+        if (!home.exists()) {
+            if (!home.mkdirs()) {
+                throw new IllegalStateException("Cannot create app folder");
+            }
+        }
+
         final DatabaseServer server = new DatabaseServer(
                 DBCredentials.USERNAME.val(),
                 DBCredentials.PASSWD.val(),
-                DBCredentials.DATABASE.val()
+                home.getAbsolutePath() + DBCredentials.DATABASE.val()
         );
 
         try {
@@ -201,10 +221,5 @@ public class MainWindowController implements Initializable {
             e.printStackTrace();
             throw new IllegalStateException("Cannot start");
         }
-
-        EventStreams.valuesOf(searchBar.textProperty())
-                .successionEnds(Duration.ofMillis(200))
-                .subscribe(s -> search());
-
     }
 }

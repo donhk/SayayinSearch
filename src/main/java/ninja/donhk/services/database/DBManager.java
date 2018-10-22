@@ -29,7 +29,7 @@ public class DBManager {
     }
 
     public void insertFile(String path, String name) throws SQLException {
-        final PreparedStatement ps = conn.prepareStatement("insert into files(path,name) values (?,?)");
+        final PreparedStatement ps = conn.prepareStatement("merge into files(path,name) values (?,?)");
         ps.setString(1, path);
         ps.setString(2, name);
         ps.executeUpdate();

@@ -3,11 +3,16 @@ package ninja.donhk.utils;
 import com.sun.javafx.PlatformUtil;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
+import ninja.donhk.services.database.DBManager;
 
 import java.awt.*;
 import java.io.*;
+import java.sql.SQLException;
+import java.text.DecimalFormat;
 
 public class Utils {
+    private static final DecimalFormat formatter = new DecimalFormat("###, ###, ###");
+
     private Utils() {
     }
 
@@ -121,5 +126,18 @@ public class Utils {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static String totalFilesText() {
+        DBManager dbManager = DBManager.getInstance();
+        try {
+            return formatter.format(dbManager.getTotalRows()) + " files";
+        } catch (SQLException e) {
+            return "-1";
+        }
+    }
+
+    public static String totalFilesText(long total) {
+        return formatter.format(total) + " matches";
     }
 }

@@ -106,7 +106,7 @@ public class ConfigurationController implements Initializable {
     private ObservableList<FileRecord> getInitData() {
         final List<FileRecord> list = new ArrayList<>();
         try {
-            for (Map.Entry<String, String> e : dbManager.getRows(-1).entrySet()) {
+            for (Map.Entry<String, String> e : dbManager.getRows(500).entrySet()) {
                 list.add(new FileRecord(e.getValue(), e.getKey()));
             }
         } catch (SQLException e) {

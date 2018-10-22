@@ -44,7 +44,7 @@ public class DBManager {
 
     public Map<String, String> searchWithRegex(String expression) throws SQLException {
         final Map<String, String> m = new HashMap<>();
-        final String sql = "select path, name from files where REGEXP_LIKE(name,?) order by name limit 500 ";
+        final String sql = "select path, name from files where REGEXP_LIKE(name,?) order by hints,name limit 500 ";
         final PreparedStatement ps = conn.prepareStatement(sql);
         ps.setString(1, expression);
         final ResultSet r = ps.executeQuery();
@@ -55,8 +55,7 @@ public class DBManager {
     }
 
     public long searchWithRegexTotal(String expression) throws SQLException {
-        final Map<String, String> m = new HashMap<>();
-        final String sql = "select count(name) total from files where REGEXP_LIKE(name,?) ";
+        final String sql = "select count(1) total from files where REGEXP_LIKE(name,?)";
         final PreparedStatement ps = conn.prepareStatement(sql);
         ps.setString(1, expression);
         final ResultSet r = ps.executeQuery();
@@ -73,7 +72,7 @@ public class DBManager {
                 .replace("%", "!%")
                 .replace("_", "!_")
                 .replace("[", "![");
-        final String sql = "select path, name from files where lower(name) like ? order by name limit 500";
+        final String sql = "select path, name from files where lower(name) like ? order by hints,name limit 500";
         final PreparedStatement ps = conn.prepareStatement(sql);
         ps.setString(1, "%" + target.toLowerCase() + "%");
         final ResultSet r = ps.executeQuery();
@@ -84,13 +83,12 @@ public class DBManager {
     }
 
     public long searchWithOutRegexTotal(String target) throws SQLException {
-        final Map<String, String> m = new HashMap<>();
         target = target
                 .replace("!", "!!")
                 .replace("%", "!%")
                 .replace("_", "!_")
                 .replace("[", "![");
-        final String sql = "select count(name) total from files where name like ? ";
+        final String sql = "select count(1) total from files where lower(name) like ? ";
         final PreparedStatement ps = conn.prepareStatement(sql);
         ps.setString(1, "%" + target + "%");
         final ResultSet r = ps.executeQuery();
@@ -105,10 +103,10 @@ public class DBManager {
         final PreparedStatement ps;
 
         if (rows == -1) {
-            final String sql1 = "select path, name from files";
+            final String sql1 = "select path, name from files order by hints,name";
             ps = conn.prepareStatement(sql1);
         } else {
-            final String sql1 = "select path, name from files limit ?";
+            final String sql1 = "select path, name from files order by hints,name limit ?";
             ps = conn.prepareStatement(sql1);
             ps.setInt(1, rows);
         }

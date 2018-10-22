@@ -45,5 +45,5 @@
             </columns>
         </TableView>
     </ScrollPane>
-    <Label fx:id="filesCounter" text="N/A"/>
+    <Label fx:id="leftCornerLabel" text="N/A"/>
 </VBox>

@@ -25,7 +25,6 @@ import org.reactfx.EventStreams;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
-import java.text.DecimalFormat;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +46,7 @@ public class MainWindowController implements Initializable {
     @FXML
     public TableColumn fileColumn;
     @FXML
-    public Label filesCounter;
+    public Label leftCornerLabel;
     @FXML
     public ScrollPane scrollPane;
 
@@ -59,11 +58,7 @@ public class MainWindowController implements Initializable {
         String rawInput = searchBar.getText().trim();
         if (rawInput.length() == 0) {
             tableView.setItems(defaultContent());
-            try {
-                filesCounter.setText(dbManager.getTotalRows() + " files");
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            leftCornerLabel.setText(Utils.totalFilesText());
             return;
         }
         final ObservableList<FileRecord> query = FXCollections.observableArrayList();
@@ -115,10 +110,7 @@ public class MainWindowController implements Initializable {
                 list.add(new FileRecord(e.getValue(), e.getKey()));
             }
 
-            Platform.runLater(() -> {
-                final DecimalFormat formatter = new DecimalFormat("#,###,###");
-                filesCounter.setText(formatter.format(total) + " matches");
-            });
+            Platform.runLater(() -> leftCornerLabel.setText(Utils.totalFilesText(total)));
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -136,7 +128,7 @@ public class MainWindowController implements Initializable {
         final FXMLLoader configLoader = new FXMLLoader(getClass().getResource("/view/configuration_menu.fxml"));
         final Parent parent = configLoader.load();
         final ConfigurationController controller = configLoader.getController();
-        controller.setFilesCounter(filesCounter);
+        controller.setFilesCounter(leftCornerLabel);
         controller.setTableView(tableView);
         final Scene secondScene = new Scene(parent);
 

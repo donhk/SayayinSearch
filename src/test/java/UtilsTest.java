@@ -12,7 +12,7 @@ public class UtilsTest {
                 "*.log"
         );
         for (String s : input) {
-            System.out.println(s + "-> " + Utils.prepateExpression(s));
+            System.out.println(s + "-> " + Utils.prepareExpression(s));
         }
     }
 }

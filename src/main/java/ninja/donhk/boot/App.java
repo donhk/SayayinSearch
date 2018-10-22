@@ -22,6 +22,7 @@ public class App extends Application {
 
         final MainWindowController controller = searchLoader.getController();
         final Scene scene = new Scene(root, 850, 460);
+        controller.setPrimaryStage(primaryStage);
 
         scene.heightProperty().addListener((obs, oldVal, newVal) -> controller.updateScrollSize(newVal));
         scene.setOnKeyPressed(event -> {

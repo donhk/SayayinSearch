@@ -12,7 +12,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
@@ -23,7 +22,6 @@ import ninja.donhk.services.database.DatabaseServer;
 import ninja.donhk.utils.Utils;
 import org.reactfx.EventStreams;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
@@ -55,6 +53,7 @@ public class MainWindowController implements Initializable {
 
     private DBManager dbManager;
     private final Pattern pattern = Pattern.compile("[$*^]");
+    private Stage primaryStage;
 
     private void search() {
         String rawInput = searchBar.getText().trim();
@@ -104,7 +103,7 @@ public class MainWindowController implements Initializable {
             final Matcher matcher = pattern.matcher(rawInput);
 
             if (matcher.find()) {
-                final String query = Utils.prepateExpression(rawInput);
+                final String query = Utils.prepareExpression(rawInput);
                 result = dbManager.searchWithRegex(query);
                 total = dbManager.searchWithRegexTotal(query);
             } else {
@@ -128,12 +127,6 @@ public class MainWindowController implements Initializable {
 
     public void updateScrollSize(Number newVal) {
         scrollPane.prefViewportHeightProperty().setValue(newVal);
-    }
-
-    public void timeToGo(KeyEvent keyEvent) {
-        if (keyEvent.getCode() == KeyCode.ESCAPE) {
-            System.out.println("escape got called");
-        }
     }
 
     public void openConfigWindow(MouseEvent mouseEvent) throws IOException {
@@ -167,6 +160,7 @@ public class MainWindowController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        initTableEvents();
         initContextMenu();
         initDatabase();
     }
@@ -199,19 +193,21 @@ public class MainWindowController implements Initializable {
                 .subscribe(s -> search());
     }
 
+    private void initTableEvents() {
+        tableView.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ESCAPE) {
+                primaryStage.close();
+            }
+        });
+    }
 
     private void initDatabase() {
-        File home = new File(System.getProperty("user.home") + File.separator + ".saya_search");
-        if (!home.exists()) {
-            if (!home.mkdirs()) {
-                throw new IllegalStateException("Cannot create app folder");
-            }
-        }
+
 
         final DatabaseServer server = new DatabaseServer(
                 DBCredentials.USERNAME.val(),
                 DBCredentials.PASSWD.val(),
-                home.getAbsolutePath() + DBCredentials.DATABASE.val()
+                Utils.getAppFolder() + DBCredentials.DATABASE.val()
         );
 
         try {
@@ -221,5 +217,9 @@ public class MainWindowController implements Initializable {
             e.printStackTrace();
             throw new IllegalStateException("Cannot start");
         }
+    }
+
+    public void setPrimaryStage(Stage primaryStage) {
+        this.primaryStage = primaryStage;
     }
 }

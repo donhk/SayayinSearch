@@ -4,6 +4,7 @@ import com.sun.javafx.PlatformUtil;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 
+import java.awt.*;
 import java.io.*;
 
 public class Utils {
@@ -27,13 +28,19 @@ public class Utils {
     }
 
     public static void openFileWithExplorer(String target) {
-        final Platform platform = findPlatform();
-        platform.openFile(target);
+        if (PlatformUtil.isLinux()) {
+            openFileLinux(target);
+        } else {
+            openFile(target);
+        }
     }
 
     public static void openPath(String target) {
-        final Platform platform = findPlatform();
-        platform.openFolder(target);
+        if (PlatformUtil.isLinux()) {
+            exploreFileLinux(target);
+        } else {
+            exploreFile(target);
+        }
     }
 
     public static void copyPathToClipboard(String target) {
@@ -43,22 +50,76 @@ public class Utils {
         clipboard.setContent(content);
     }
 
-    private static Platform findPlatform() {
-        Platform platform;
-        if (PlatformUtil.isWindows()) {
-            platform = new Windows();
-        } else if (PlatformUtil.isMac()) {
-            platform = new MacOS();
-        } else {
-            platform = new Linux();
-        }
-        return platform;
-    }
-
-    public static String prepateExpression(String string) {
-        StringBuilder sb = new StringBuilder();
+    public static String prepareExpression(String string) {
         string = string.replace(".", "\\.");
         string = string.replace("*", ".*");
         return string;
+    }
+
+    public static String getAppFolder() {
+        final File home = new File(System.getProperty("user.home") + File.separator + ".saya_search");
+        if (!home.exists()) {
+            if (!home.mkdirs()) {
+                throw new IllegalStateException("Cannot create app folder");
+            }
+        }
+        return home.getAbsolutePath() + File.separator;
+    }
+
+    public static void openFile(String target) {
+        final Desktop desktop = Desktop.getDesktop();
+        try {
+            File file = new File(target);
+            desktop.open(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void exploreFile(String target) {
+        final Desktop desktop = Desktop.getDesktop();
+        try {
+            File file = new File(target);
+            if (file.isDirectory()) {
+                desktop.open(file);
+            } else {
+                if (file.getParentFile() != null) {
+                    desktop.open(file.getParentFile());
+                } else {
+                    desktop.open(file);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void openFileLinux(String target) {
+        final File file = new File(target);
+        final ProcessBuilder pb = new ProcessBuilder("sh", "-c", "xdg-open '" + file.getAbsolutePath() + "'");
+        try {
+            pb.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void exploreFileLinux(String target) {
+        final File file = new File(target);
+        final ProcessBuilder pb;
+        if (file.isDirectory()) {
+            pb = new ProcessBuilder("sh", "-c", "xdg-open '" + file.getAbsolutePath() + "'");
+        } else {
+            if (file.getParentFile() != null) {
+                pb = new ProcessBuilder("sh", "-c", "xdg-open '" + file.getParentFile().getAbsolutePath() + "'");
+            } else {
+                pb = new ProcessBuilder("sh", "-c", "xdg-open '" + file.getAbsolutePath() + "'");
+            }
+        }
+        try {
+            pb.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

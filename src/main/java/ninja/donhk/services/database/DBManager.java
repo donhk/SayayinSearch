@@ -6,12 +6,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import ninja.donhk.utils.Utils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 
 public class DBManager {
 
-    private final Logger logger = LoggerFactory.getLogger(DBManager.class);
     private final Connection conn;
     private static DBManager instance = null;
 
@@ -75,9 +73,9 @@ public class DBManager {
                 .replace("%", "!%")
                 .replace("_", "!_")
                 .replace("[", "![");
-        final String sql = "select path, name from files where name like ? order by name limit 500";
+        final String sql = "select path, name from files where lower(name) like ? order by name limit 500";
         final PreparedStatement ps = conn.prepareStatement(sql);
-        ps.setString(1, "%" + target + "%");
+        ps.setString(1, "%" + target.toLowerCase() + "%");
         final ResultSet r = ps.executeQuery();
         while (r.next()) {
             m.put(r.getString("path"), r.getString("name"));

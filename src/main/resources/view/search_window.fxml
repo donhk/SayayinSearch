@@ -32,12 +32,12 @@
     <ScrollPane fx:id="scrollPane" fitToHeight="true" fitToWidth="true" prefViewportHeight="1024">
         <TableView fx:id="tableView" onMouseClicked="#getRowOptions">
             <columns>
-                <TableColumn fx:id="fileColumn" prefWidth="250.0" text="File">
+                <TableColumn fx:id="fileColumn" prefWidth="300.0" text="File">
                     <cellValueFactory>
                         <PropertyValueFactory property="name"/>
                     </cellValueFactory>
                 </TableColumn>
-                <TableColumn fx:id="pathColumn" prefWidth="600.0" text="Path">
+                <TableColumn fx:id="pathColumn" prefWidth="700.0" text="Path">
                     <cellValueFactory>
                         <PropertyValueFactory property="path" />
                     </cellValueFactory>

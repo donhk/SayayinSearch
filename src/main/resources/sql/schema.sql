@@ -2,8 +2,8 @@ drop table if exists files;
 
 create table files
 (
-  path  varchar(2000) primary key,
-  name  varchar(2000),
+  path  varchar(1500) primary key,
+  name  varchar(100),
   hints bigint default 1
 );
 

@@ -31,7 +31,7 @@ public class IndexWorker implements Callable<Void> {
                     for (Path path : directoryStream) {
                         stack.push(path);
                     }
-                } catch (AccessDeniedException e) {
+                } catch (Exception e) {
                     //ignored
                 }
             } else {

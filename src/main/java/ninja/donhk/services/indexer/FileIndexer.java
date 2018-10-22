@@ -29,7 +29,7 @@ public class FileIndexer {
 
     public void loadFiles() {
         final List<File> pathsToScan = provider.findTargets();
-        final ExecutorService executor = Executors.newFixedThreadPool(8);
+        final ExecutorService executor = Executors.newFixedThreadPool(3);
         final CompletionService<Void> service = new ExecutorCompletionService<>(executor);
 
         for (File aPathsToScan : pathsToScan) {

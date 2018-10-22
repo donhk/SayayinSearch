@@ -1,6 +1,5 @@
 package ninja.donhk.controllers;
 
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -55,31 +54,48 @@ public class MainWindowController implements Initializable {
     private Stage primaryStage;
 
     private void search() {
-        String rawInput = searchBar.getText().trim();
+        final String rawInput = searchBar.getText().trim();
         if (rawInput.length() == 0) {
             tableView.setItems(defaultContent());
             leftCornerLabel.setText(Utils.totalFilesText());
             return;
         }
-        final ObservableList<FileRecord> query = FXCollections.observableArrayList();
+
+        final ObservableList<FileRecord> resultSet = FXCollections.observableArrayList();
+        final String query = Utils.prepareExpression(rawInput);
         final Task<Void> task = new Task<Void>() {
             @Override
-            protected Void call() throws Exception {
-                query.addAll(processQuery(rawInput));
+            protected Void call() {
+                resultSet.addAll(processQuery(query));
                 return null;
             }
         };
-        task.setOnSucceeded(e -> tableView.setItems(query));
-        Thread thread = new Thread(task);
+
+        task.setOnSucceeded(e -> {
+            final Matcher matcher = pattern.matcher(query);
+            long total = -1;
+            try {
+                if (matcher.find()) {
+                    total = dbManager.searchWithRegexTotal(query);
+                } else {
+                    total = dbManager.searchWithOutRegexTotal(rawInput);
+                }
+            } catch (SQLException q) {
+                q.printStackTrace();
+            }
+            tableView.setItems(resultSet);
+            leftCornerLabel.setText(Utils.totalFilesText(total));
+        });
+
+        final Thread thread = new Thread(task);
         thread.setDaemon(true);
         thread.start();
     }
 
     private ObservableList<FileRecord> defaultContent() {
         final List<FileRecord> list = new ArrayList<>();
-
         try {
-            Map<String, String> result = dbManager.getRows(500);
+            Map<String, String> result = dbManager.getRows(100);
             for (Map.Entry<String, String> e : result.entrySet()) {
                 list.add(new FileRecord(e.getValue(), e.getKey()));
             }
@@ -89,28 +105,24 @@ public class MainWindowController implements Initializable {
         return FXCollections.observableArrayList(list);
     }
 
-    private ObservableList<FileRecord> processQuery(String rawInput) {
+    private ObservableList<FileRecord> processQuery(String query) {
         final List<FileRecord> list = new ArrayList<>();
 
         try {
             final Map<String, String> result;
-            final long total;
-            final Matcher matcher = pattern.matcher(rawInput);
+
+            final Matcher matcher = pattern.matcher(query);
 
             if (matcher.find()) {
-                final String query = Utils.prepareExpression(rawInput);
                 result = dbManager.searchWithRegex(query);
-                total = dbManager.searchWithRegexTotal(query);
-            } else {
-                result = dbManager.searchWithOutRegex(rawInput);
-                total = dbManager.searchWithOutRegexTotal(rawInput);
-            }
 
+            } else {
+                result = dbManager.searchWithOutRegex(query);
+
+            }
             for (Map.Entry<String, String> e : result.entrySet()) {
                 list.add(new FileRecord(e.getValue(), e.getKey()));
             }
-
-            Platform.runLater(() -> leftCornerLabel.setText(Utils.totalFilesText(total)));
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -184,7 +196,7 @@ public class MainWindowController implements Initializable {
         tableView.setEditable(false);
 
         EventStreams.valuesOf(searchBar.textProperty())
-                .successionEnds(Duration.ofMillis(250))
+                .successionEnds(Duration.ofMillis(700))
                 .subscribe(s -> search());
     }
 

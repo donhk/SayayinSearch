@@ -3,6 +3,7 @@ package ninja.donhk.services.database;
 import java.io.IOException;
 import java.sql.*;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import ninja.donhk.utils.Utils;
@@ -43,8 +44,8 @@ public class DBManager {
     }
 
     public Map<String, String> searchWithRegex(String expression) throws SQLException {
-        final Map<String, String> m = new HashMap<>();
-        final String sql = "select path, name from files where REGEXP_LIKE(name,?) order by hints,name limit 500 ";
+        final Map<String, String> m = new LinkedHashMap<>();
+        final String sql = "select path, name from files where REGEXP_LIKE(name,?) order by hints,name desc limit 100 ";
         final PreparedStatement ps = conn.prepareStatement(sql);
         ps.setString(1, expression);
         final ResultSet r = ps.executeQuery();
@@ -66,13 +67,13 @@ public class DBManager {
     }
 
     public Map<String, String> searchWithOutRegex(String target) throws SQLException {
-        final Map<String, String> m = new HashMap<>();
+        final Map<String, String> m = new LinkedHashMap<>();
         target = target
                 .replace("!", "!!")
                 .replace("%", "!%")
                 .replace("_", "!_")
                 .replace("[", "![");
-        final String sql = "select path, name from files where lower(name) like ? order by hints,name limit 500";
+        final String sql = "select path, name from files where lower(name) like ? order by hints,name desc limit 100";
         final PreparedStatement ps = conn.prepareStatement(sql);
         ps.setString(1, "%" + target.toLowerCase() + "%");
         final ResultSet r = ps.executeQuery();

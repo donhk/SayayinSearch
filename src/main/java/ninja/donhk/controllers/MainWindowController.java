@@ -79,7 +79,7 @@ public class MainWindowController implements Initializable {
         final List<FileRecord> list = new ArrayList<>();
 
         try {
-            Map<String, String> result = dbManager.getRows(-1);
+            Map<String, String> result = dbManager.getRows(500);
             for (Map.Entry<String, String> e : result.entrySet()) {
                 list.add(new FileRecord(e.getValue(), e.getKey()));
             }
@@ -163,16 +163,19 @@ public class MainWindowController implements Initializable {
         final MenuItem open = new MenuItem("Open");
         open.setOnAction(e -> {
             final String file = tableView.getSelectionModel().getSelectedItem().pathProperty().getValue();
+            dbManager.updateHints(file);
             Utils.openFileWithExplorer(file);
         });
         final MenuItem openPath = new MenuItem("Explore path");
         openPath.setOnAction(e -> {
             final String file = tableView.getSelectionModel().getSelectedItem().pathProperty().getValue();
+            dbManager.updateHints(file);
             Utils.openPath(file);
         });
         final MenuItem copyPath = new MenuItem("Copy path");
         copyPath.setOnAction(e -> {
             final String file = tableView.getSelectionModel().getSelectedItem().pathProperty().getValue();
+            dbManager.updateHints(file);
             Utils.copyPathToClipboard(file);
         });
 
@@ -181,7 +184,7 @@ public class MainWindowController implements Initializable {
         tableView.setEditable(false);
 
         EventStreams.valuesOf(searchBar.textProperty())
-                .successionEnds(Duration.ofMillis(200))
+                .successionEnds(Duration.ofMillis(250))
                 .subscribe(s -> search());
     }
 
@@ -194,8 +197,6 @@ public class MainWindowController implements Initializable {
     }
 
     private void initDatabase() {
-
-
         final DatabaseServer server = new DatabaseServer(
                 DBCredentials.USERNAME.val(),
                 DBCredentials.PASSWD.val(),

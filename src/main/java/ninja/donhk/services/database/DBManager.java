@@ -115,6 +115,8 @@ public class DBManager {
         while (r.next()) {
             m.put(r.getString("path"), r.getString("name"));
         }
+
+        ps.close();
         return m;
     }
 
@@ -148,5 +150,26 @@ public class DBManager {
             stmt.closeOnCompletion();
         }
 
+    }
+
+    public void updateHints(String target) {
+        long cVal = 1;
+        try (PreparedStatement total = conn.prepareStatement("select hints from files where path=?")) {
+            total.setString(1, target);
+            ResultSet rs = total.executeQuery();
+            if (rs.next()) {
+                cVal = rs.getLong("hints");
+            }
+        } catch (SQLException p) {
+            p.printStackTrace();
+        }
+        cVal++;
+        try (PreparedStatement psUpd = conn.prepareStatement("update files set hints=? where path=?")) {
+            psUpd.setLong(1, cVal);
+            psUpd.setString(2, target);
+            psUpd.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

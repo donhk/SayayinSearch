@@ -196,7 +196,7 @@ public class MainWindowController implements Initializable {
         tableView.setEditable(false);
 
         EventStreams.valuesOf(searchBar.textProperty())
-                .successionEnds(Duration.ofMillis(700))
+                .successionEnds(Duration.ofMillis(250))
                 .subscribe(s -> search());
     }
 

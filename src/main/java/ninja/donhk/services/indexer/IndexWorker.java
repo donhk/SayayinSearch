@@ -2,7 +2,6 @@ package ninja.donhk.services.indexer;
 
 import ninja.donhk.services.database.DBManager;
 
-import java.nio.file.AccessDeniedException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
